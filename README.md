@@ -8,7 +8,6 @@
 3. Возможность сделать выборку по городу, статусу.
 4. Должно быть табло прилета, вылета и интерфейс администратора для управления.
 5. Должен быть счетчик рейсов.
-
 6. Должна быть подробная документация о том, как развернуть проект.
 7. Проект должен быть готов к тому, чтобы вывесить его на внешнем домене.
 8. Оформить все в git-репозитории (включая документацию по API)
@@ -16,16 +15,40 @@
 Будет оцениваться именно качество готового решения.
 
 
-# Common comments
-1. Implemented as a web-service with a web-client and api.
-2. Selected simple shorting link method (not specified in the task)
-3. Unit testing was not applied (there is not in the task and too simple task).
-4. Deploy work was not performed (not specified in the task).
-5. A pre-installed MySQL Server 5.5 database was used: 
-	to migrate models and working with db, you need to have a db available according with settings.py:
+# Тестовые (начальные) данные для БД
+Можно заполнить БД тестовыми данными через главное меню.
 
-# Test data for db
-You can fill db by pressing button "Fill with test data" on main menu of web-client application or  
-by running script "fill_db.py" from project folder.
+# API
 
-# For api using
+# Деплой
+
+1. Затягиваем проект, обеспечиваем окружение
+sudo apt-get install python3
+sudo apt install python3-pip
+apt-get install git
+cd /var
+git clone https://github.com/ShmakovVA/test_aideco
+cd /test_aideco
+pip3 install -r requirements.txt
+
+1.1. Создаем в корне файл local_settings.py
+--
+DEBUG = False
+SECRET_KEY = '$n-rn1*khir^n60le#x508w!6nb3fv(=8-watz8je3+prs)sgu'
+--
+
+2. БД (миграции, суперпользователь)
+python3 manage.py makemigrations airport
+python3 manage.py migrate airport
+python3 manage.py migrate
+python3 manage.py createsuperuser --username worker --email worker@example.me
+python3 manage.py collectstatic
+
+3. Ставим и настраиваем апач на раздачу статики (критично только для стилей <zerb foundation>)
+apt-get install apache2 libapache2-mod-wsgi-py3
+
+4. Ставим uwsgi и стартуем сервер
+pip3 install uwsgi
+uwsgi --http :8000 --wsgi-file aideco/wsgi.py
+
+

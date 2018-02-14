@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'airport.apps.AirportConfig',
     'tastypie',
-    'django_tables2',
+    # 'django_tables2',
 ]
 
 MIDDLEWARE = [
