@@ -1,0 +1,50 @@
+{% extends 'common/base.html' %}
+{#{% load render_table from django_tables2 %}#}
+{% block main %}
+
+    <form action="" method="post">
+        <div class="row float-center">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="large-3 columns">
+                    {{ field.label_tag }}{{ field }}
+                </div>
+            {% endfor %}
+            <div class="large-3 columns float-left float-left">
+                <button class="button fi-filter" style="width: 100%; margin-top: 23px"> Filter</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="grid-container">
+        <div class="grid-x grid-padding-x">
+{#            <table>#}
+{#                {% render_table flights %}#}
+{#            </table>#}
+
+            <table >
+                <tr>
+                    <th>Flight</th>
+                    <th>Direction</th>
+                    <th>Time</th>
+                    <th>Time (actually)</th>
+                    <th>Gate</th>
+                    <th>Status</th>
+                    <th>Type of Fly</th>
+                </tr>
+                {% for f in flights %}
+                <tr >
+                    <td class="text-center">{{ f.flight.name }}</td>
+                    <td class="text-center">{{ f.flight.direction_from }} --- {{ f.flight.direction_to }}</td>
+                    <td class="text-center">{{ f.time_from }}</td>
+                    <td class="text-center">{{ f.time_to }}</td>
+                    <td class="text-center">{{ f.gate }}</td>
+                    <td class="text-center">{{ f.status }}</td>
+                    <td class="text-center">{{ f.fly_type }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+
+        </div>
+    </div>
+{% endblock %}
