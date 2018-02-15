@@ -74,7 +74,7 @@ class FlyArrivalResource(ModelResource):
     class Meta:
         authorization = Authorization()
         queryset = Fly.objects.all()  # .filter(flight__arr_dep=0)
-        resource_name = 'arrivals'
+        resource_name = 'flights'
         fields = ['id', 'time_from', 'time_to', 'comment']
         filtering = {
             'flight': ALL_WITH_RELATIONS,
