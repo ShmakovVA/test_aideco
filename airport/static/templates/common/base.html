@@ -28,17 +28,17 @@
 
     <div class="grid-x grid-padding-x">
         <div class="large-12 cell">
-            <h1 class="title-bar text-center fi-ticket"> Welcome to Airport </h1>
+            <h1 class="title-bar text-center fi-ticket"> Добро пожаловать ! </h1>
         </div>
     </div>
 
     <div class="grid-x grid-padding-x">
         <div class="large-12 cell text-center">
             <ul>
-                <a class="button fi-arrow-down medium-2" href={% url 'a' %}> Arrivals </a>
-                <a class="button fi-arrow-up medium-2" href={% url 'd' %}> Departures </a>
+                <a class="button fi-arrow-down medium-2" href={% url 'a' %}> Прибытия </a>
+                <a class="button fi-arrow-up medium-2" href={% url 'd' %}> Отправления </a>
 
-                <a class="button secondary fi-page-add medium-2" href={% url 'fill_db' %}> Fill data </a>
+                <a class="button secondary fi-page-add medium-2" href={% url 'fill_db' %}> Заполнить БД </a>
             </ul>
         </div>
     </div>
@@ -46,7 +46,7 @@
 </div>
 
 {% block main %}
-    <h1 class="text-center fi-like"> Select Arrivals or Departures </h1>
+    <h1 class="text-center fi-like"> Выбирите Прибытия или Отправления </h1>
 {% endblock %}
 
 <script src="/foundation/js/vendor/jquery.js"></script>

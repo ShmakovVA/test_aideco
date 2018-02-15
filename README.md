@@ -19,36 +19,52 @@
 Можно заполнить БД тестовыми данными через главное меню.
 
 # API
+Доступно выполнение запроса к БД извне посредствам выполнения GET запроса с параметрами фильтрации:
+(Если фильтры не пустые, то производится фильтрация по вхождению подстроки)
+
+* arr_or_dep - 'arr', 'dep' (прибытия или отправления соответственно)
+* status - статус
+* city - направление
+* flight - рейс
+
+Нужно установить Content-Type в значение application/json
+
 
 # Деплой
 
-1. Затягиваем проект, обеспечиваем окружение
-sudo apt-get install python3
-sudo apt install python3-pip
-apt-get install git
-cd /var
-git clone https://github.com/ShmakovVA/test_aideco
-cd /test_aideco
-pip3 install -r requirements.txt
-
-1.1. Создаем в корне файл local_settings.py
+Затягиваем проект, обеспечиваем окружение
 --
-DEBUG = False
-SECRET_KEY = '$n-rn1*khir^n60le#x508w!6nb3fv(=8-watz8je3+prs)sgu'
+* sudo apt-get install python3
+* sudo apt install python3-pip
+* apt-get install git
+* cd /var
+* git clone https://github.com/ShmakovVA/test_aideco
+* cd /test_aideco
+* pip3 install -r requirements.txt
+
+Создаем в корне файл local_settings.py с содержимым:
 --
 
-2. БД (миграции, суперпользователь)
-python3 manage.py makemigrations airport
-python3 manage.py migrate airport
-python3 manage.py migrate
-python3 manage.py createsuperuser --username worker --email worker@example.me
-python3 manage.py collectstatic
+    DEBUG = False
+    SECRET_KEY = '$n-rn1*khir^n60le#x508w!6nb3fv(=8-watz8je3+prs)sgu'
 
-3. Ставим и настраиваем апач на раздачу статики (критично только для стилей <zerb foundation>)
-apt-get install apache2 libapache2-mod-wsgi-py3
 
-4. Ставим uwsgi и стартуем сервер
-pip3 install uwsgi
-uwsgi --http :8000 --wsgi-file aideco/wsgi.py
+БД (миграции, суперпользователь)
+--
+
+* python3 manage.py makemigrations airport
+* python3 manage.py migrate airport
+* python3 manage.py migrate
+* python3 manage.py createsuperuser --username worker --email worker@example.me
+* python3 manage.py collectstatic
+
+Ставим и настраиваем апач на раздачу статики (критично только для стилей <zerb foundation>)
+--
+* apt-get install apache2 libapache2-mod-wsgi-py3
+
+Ставим uwsgi и стартуем сервер
+--
+* pip3 install uwsgi
+* uwsgi --http :8000 --wsgi-file django.wsgi
 
 

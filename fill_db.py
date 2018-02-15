@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.db import IntegrityError
 
 from airport.models import City, Status, Gate, Type_fly

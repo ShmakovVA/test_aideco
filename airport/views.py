@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from logging import log
 
 from django.http import HttpResponseRedirect
@@ -7,24 +8,24 @@ from airport.forms import FormFilterFlights
 from airport.models import Fly
 from fill_db import fill_city, fill_gates, fill_status, fill_types_fly
 
-LIM_OBJ = 20  # limit flights for board
+LIM_OBJ = 20  # количество объектов на табло
 
 
 def home(request):
     """
-    Welcome page (w/o data)
+    Приветственный экран
     :param request:
-    :return: render with title and main menu buttons
+    :return: рендер приветственного экрана
     """
     return render(request, 'common/base.html', context={})
 
 
 def get_flights_context(request, arr_or_dep):
     """
-    Generate context for rendering board.
-    :param request: arrivals or departures request
-    :param arr_or_dep: if 0 - arrivals, otherwise - departure
-    :return: context for rendering "home.html" like {'form': form, 'flights': flights}
+    Формирование табло прилетов/отправлений
+    :param request:
+    :param arr_or_dep: если = 0 - прибытие, иначе - отправление
+    :return: контекст для рендера страницы в виде {'form': form, 'flights': flights}
     """
     form = FormFilterFlights()
     flights = []
@@ -38,7 +39,7 @@ def get_flights_context(request, arr_or_dep):
 
                 flights = Fly.objects.all().filter(flight__name__icontains=flight_name)
                 if status_name:
-                    flights = Fly.objects.all().filter(flight__fly__status=status_name)
+                    flights = flights.filter(flight__fly__status=status_name)
 
                 if arr_or_dep == 0:
                     flights = flights.filter(flight__direction_from__name__icontains=city_name)
@@ -54,9 +55,9 @@ def get_flights_context(request, arr_or_dep):
 
 def arrivals(request):
     """
-    Show arrivals board
+    Показ прибывающих рейсов
     :param request:
-    :return: render with context from get_flights_context
+    :return: рендер с контекстом get_flights_context
     """
     ctx = get_flights_context(request, 0)
     return render(request, 'home.html', context=ctx)
@@ -64,9 +65,9 @@ def arrivals(request):
 
 def departures(request):
     """
-    Show departures board
+    Показ отбывающих рейсов
     :param request:
-    :return: render with context from get_flights_context
+    :return: рендер с контекстом get_flights_context
     """
     ctx = get_flights_context(request, 1)
     return render(request, 'home.html', context=ctx)
@@ -74,9 +75,9 @@ def departures(request):
 
 def test_fill(request):
     """
-    Filling db with test data
+    Заполнение тестовыми данными БД
     :param request:
-    :return: redirect to home
+    :return: перенаправление на стартовую
     """
     fill_city()
     fill_gates()

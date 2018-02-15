@@ -13,22 +13,24 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
 from tastypie.api import Api
 
-from airport.api.resources import FlyArrivalResource, FlyDepartureResource
+from airport.api.resources import FlyArrivalResource#, FlyDepartureResource
 from airport.views import arrivals, test_fill, departures, home
 
 v1_api = Api(api_name='v1')
 v1_api.register(FlyArrivalResource())
-v1_api.register(FlyDepartureResource())
+# v1_api.register(FlyDepartureResource())
 
 
 urlpatterns = [
     url('admin/', admin.site.urls),
 
     url(r'^test_fill/', test_fill, name='fill_db'),
+
+    url(r'api/', include(v1_api.urls)),
 
     url(r'^arrivals/', arrivals, name='a'),
     url(r'^departures/', departures, name='d'),

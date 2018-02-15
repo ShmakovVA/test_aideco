@@ -1,72 +1,143 @@
-from django.conf.urls import url
+# -*- coding: utf-8 -*-
+from django.db.models import Q
 from tastypie.authorization import Authorization
+from tastypie.constants import ALL_WITH_RELATIONS
 from tastypie.resources import ModelResource
 
-from airport.models import Fly
+from airport.models import Fly, Flight, City, Status
+
+
+def get_foreign(resource_calss, query_set):
+    """
+    Выполнение полной дегидрации объектов
+    :param resource_calss: класс ресурса
+    :param query_set: набор объектов для дегидрации
+    :return:
+    """
+    resource = resource_calss()
+    res = {'objects': []}
+    for obj in query_set:
+        bundle = resource.build_bundle(obj=obj)
+        dehydrate_obj = resource.full_dehydrate(bundle)
+        res['objects'].append(dehydrate_obj)
+    return res
+
+
+class FlightResource(ModelResource):
+    """
+    Ресурс "Рейсы"
+    """
+
+    class Meta:
+        authorization = Authorization()
+        queryset = Flight.objects.all()  # .filter(flight__arr_dep=0)
+        resource_name = 'flight'
+
+    def dehydrate(self, bundle):
+        """
+        Раскрытие входящих объектов связанных через внешний ключ
+        :param bundle:
+        :return:
+        """
+        bundle.data['direction_from'] = get_foreign(CityResource, City.objects.filter(pk=bundle.obj.direction_from.pk))
+        bundle.data['direction_to'] = get_foreign(CityResource, City.objects.filter(pk=bundle.obj.direction_to.pk))
+        return bundle
+
+
+class CityResource(ModelResource):
+    """
+    Ресурс "Города"
+    """
+
+    class Meta:
+        authorization = Authorization()
+        queryset = City.objects.all()
+        resource_name = 'city'
+
+
+class StatusResource(ModelResource):
+    """
+    Ресурс "Статусы"
+    """
+
+    class Meta:
+        authorization = Authorization()
+        queryset = Status.objects.all()
+        resource_name = 'status'
 
 
 class FlyArrivalResource(ModelResource):
+    """
+    Ресурс "Перелеты"
+    """
+
     class Meta:
         authorization = Authorization()
-        queryset = Fly.objects.all().filter(flight__arr_dep=0)
+        queryset = Fly.objects.all()  # .filter(flight__arr_dep=0)
         resource_name = 'arrivals'
+        fields = ['id', 'time_from', 'time_to', 'comment']
+        filtering = {
+            'flight': ALL_WITH_RELATIONS,
+            'status': ALL_WITH_RELATIONS
+        }
 
-    def prepend_urls(self):
+    def dehydrate(self, bundle):
         """
-        bind "process" to url
+        Раскрытие входящих объектов связанных через внешний ключ
+        :param bundle:
         :return:
         """
-        return [url(r'^arrivals/$', self.wrap_view('process'))]
+        bundle.data['flight'] = get_foreign(FlightResource, Flight.objects.filter(pk=bundle.obj.flight.pk))
+        bundle.data['status'] = get_foreign(StatusResource, Status.objects.filter(pk=bundle.obj.status.pk))
+        return bundle
 
-    def process(self, request, **kwargs):
+    def apply_filters(self, request, applicable_filters):
         """
-        Got request arrivals with filter params (city name and/or flyght name).
+        Фильтрация объектов по заданным в реквесте параметрам.
+        Если фильтры не пустые, то производится фильтрация по вхождению подстроки.
+        Доступные параметры:
+            arr_or_dep - допустимые значения - 'arr', 'dep' (прибытия и отправления соответственно)
+            status - статус
+            city - направление
+            flight - рейс
         :param request:
-        :param kwargs:
+        :param applicable_filters:
         :return:
         """
-        self.method_check(request, allowed=['get'])
-        data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
-        city_name = data.get('city', None)
-        flyght_name = data.get('flyght', None)
-        status_name = data.get('status', None)
+        base_object_list = super(FlyArrivalResource, self).apply_filters(request, applicable_filters)
 
-        # if param_url:
-        #     try:
-        #         fly = Fly.objects.get(url=data.get('url', ''))
-        #     except Fly.DoesNotExist:
-        #         fly = Fly(click_count=0, url=param_url, hash=hash(param_url))
-        #         fly.save()
-        #         return self.create_response(request, {'hash': fly.hash})
-        #     return self.create_response(request, {'hash': fly.hash})
-        # else:
-        #     try:
-        #         fly = Link.objects.get(hash=data.get('hash', ''))
-        #     except Link.DoesNotExist:
-        #         return self.create_response(request, {'error': 'DoesNotExist'})
-        #     fly.inc_clicks()
-        #     return self.create_response(request, {'url': fly.url})
+        arr_or_dep = request.GET.get('arr_or_dep', None)
+        status = request.GET.get('status', None)
+        city = request.GET.get('city', None)
+        flight = request.GET.get('flight', None)
 
-class FlyDepartureResource(ModelResource):
-    class Meta:
-        authorization = Authorization()
-        queryset = Fly.objects.all().filter(flight__arr_dep=1)
-        resource_name = 'departure'
+        if arr_or_dep and arr_or_dep == '':
+            arr_or_dep = None
+        if status and status == '':
+            status = None
+        if city and city == '':
+            city = None
+        if flight and flight == '':
+            flight = None
 
-    def prepend_urls(self):
-        """
-        bind "process" to url
-        :return:
-        """
-        return [url(r'^departure/$', self.wrap_view('process'))]
+        if arr_or_dep and base_object_list:
+            if arr_or_dep in ['arr', 'dep']:
+                if arr_or_dep == 'arr':
+                    qt = Q(flight__arr_dep=0)
+                else:
+                    qt = Q(flight__arr_dep=1)
+                base_object_list = base_object_list.filter(qt).distinct()
+            else:
+                return []
 
-    def process(self, request, **kwargs):
-        """
-        Got request departures with filter params (city name and/or flyght name).
-        :param request:
-        :param kwargs:
-        :return:
-        """
-        self.method_check(request, allowed=['post'])
-        data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
-        param_url = data.get('url', None)
+        if status and base_object_list:
+            qs = Q(status__name__icontains=status)
+            base_object_list = base_object_list.filter(qs).distinct()
+        if city and base_object_list:
+            qc = Q(flight__direction_from__name__icontains=city)
+            base_object_list = base_object_list.filter(qc).distinct()
+        if flight and base_object_list:
+            qf = Q(flight__name__icontains=flight)
+            base_object_list = base_object_list.filter(qf).distinct()
+
+        return base_object_list
