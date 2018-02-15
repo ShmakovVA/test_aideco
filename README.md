@@ -15,7 +15,25 @@
 Будет оцениваться именно качество готового решения.
 
 
-# Тестовые (начальные) данные для БД
+# БД
+По умолчанию проект сконфигурирован на использование sqlite3.
+Для использования другой БД (например, MySQL) необходимо дополнительно:
+* Установить модуль mysqlclient==1.3.6
+* Заменить в файле settings.py DATABASES на:
+```
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': '',
+            'USER': '',
+            'PASSWORD': '',
+            'HOST': '',
+            'PORT': '',
+        }
+    }
+```    
+и, заполнив конфигурационные параметры, приступить к миграции.
+ 
 Можно заполнить БД тестовыми данными через главное меню.
 
 # API
@@ -29,13 +47,16 @@
 
 Нужно установить Content-Type в значение application/json
 
+# Панель администратора
+
+Используется встроенная админ панель Django.
 
 # Деплой
 
 Затягиваем проект, обеспечиваем окружение
 --
-* sudo apt-get install python3
-* sudo apt install python3-pip
+* apt-get install python3
+* apt-get install python3-pip
 * apt-get install git
 * cd /var
 * git clone https://github.com/ShmakovVA/test_aideco
@@ -44,10 +65,10 @@
 
 Создаем в корне файл local_settings.py с содержимым:
 --
-
+```
     DEBUG = False
     SECRET_KEY = '$n-rn1*khir^n60le#x508w!6nb3fv(=8-watz8je3+prs)sgu'
-
+```
 
 БД (миграции, суперпользователь)
 --
@@ -61,6 +82,7 @@
 Ставим и настраиваем апач на раздачу статики (критично только для стилей <zerb foundation>)
 --
 * apt-get install apache2 libapache2-mod-wsgi-py3
+>P.S.: Нужно собрать конфиг с пробросом /static/ /var/test_aideco/static 
 
 Ставим uwsgi и стартуем сервер
 --
