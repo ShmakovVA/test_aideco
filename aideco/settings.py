@@ -24,7 +24,7 @@ SECRET_KEY = '$n-rn1*khir^n60le#x508w!6nb3fv(=8-watz8je3+prs)sgu'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -54,7 +54,8 @@ ROOT_URLCONF = 'aideco.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'airport/static/templates'), ],
+        'DIRS': [os.path.join(BASE_DIR, 'airport/static/templates'),
+                 os.path.join(BASE_DIR, 'airport/static/foundation'), ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -121,5 +122,3 @@ try:
     from local_settings import *
 except ImportError:
     pass
-
-DEBUG = True
