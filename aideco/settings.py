@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'airport.apps.AirportConfig',
     'tastypie',
-    # 'django_tables2',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +54,7 @@ ROOT_URLCONF = 'aideco.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'airport/static/templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'airport/static/templates'), ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

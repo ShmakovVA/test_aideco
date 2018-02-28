@@ -14,9 +14,6 @@ class City(models.Model):
     def __str__(self):
         return '{} [{}]'.format(self.name, self.code)
 
-    def __unicode__(self):
-        return u'{} [{}]'.format(self.name, self.code)
-
     class Meta:
         verbose_name = "Города"
 
@@ -29,9 +26,6 @@ class Status(models.Model):
 
     def __str__(self):
         return '{}'.format(self.name)
-
-    def __unicode__(self):
-        return u'{}'.format(self.name)
 
     class Meta:
         verbose_name = "Статусы"
@@ -46,14 +40,11 @@ class Gate(models.Model):
     def __str__(self):
         return '{}'.format(self.name)
 
-    def __unicode__(self):
-        return u'{}'.format(self.name)
-
     class Meta:
         verbose_name = "Выходы"
 
 
-class Type_fly(models.Model):
+class TypeFly(models.Model):
     """
     Типы ВС
     """
@@ -61,9 +52,6 @@ class Type_fly(models.Model):
 
     def __str__(self):
         return '{}'.format(self.name)
-
-    def __unicode__(self):
-        return u'{}'.format(self.name)
 
     class Meta:
         verbose_name = "Типы ВС"
@@ -74,8 +62,8 @@ class Flight(models.Model):
     Рейсы (название, направление, счетчик завершенных перелетов)
     """
     name = models.CharField(max_length=25, blank=False, null=False, unique=True, verbose_name=u'Рейс')
-    direction_from = models.ForeignKey(City, verbose_name=u'Из', related_name='from_city')
-    direction_to = models.ForeignKey(City, verbose_name=u'В', related_name='to_city')
+    direction_from = models.ForeignKey(City, on_delete=models.CASCADE, verbose_name=u'Из', related_name='from_city')
+    direction_to = models.ForeignKey(City, on_delete=models.CASCADE, verbose_name=u'В', related_name='to_city')
     arr_dep = models.PositiveSmallIntegerField(verbose_name=u'Вылет/Прилет (1/0)', default=0)
     counter = models.IntegerField(default=0, verbose_name=u'Количество завершенных (автоинкремент)')
 
@@ -87,10 +75,6 @@ class Flight(models.Model):
         return '[{}]_________[{} - {}]______________{}'.format(self.name, self.direction_from, self.direction_to,
                                                                self.counter)
 
-    def __unicode__(self):
-        return u'[{}]_________[{} - {}]______________{}'.format(self.name, self.direction_from,
-                                                                self.direction_to, self.counter)
-
     class Meta:
         verbose_name = "Рейсы"
 
@@ -101,10 +85,10 @@ class Fly(models.Model):
     """
     Перелеты с параметрами и в соответствии рейсу
     """
-    flight = models.ForeignKey(Flight, verbose_name=u'Рейс')
-    gate = models.ForeignKey(Gate, verbose_name=u'Выход', blank=True, null=True)
-    status = models.ForeignKey(Status, verbose_name=u'Статус', blank=True, null=True)
-    fly_type = models.ForeignKey(Type_fly, verbose_name=u'Тип ВС', blank=True, null=True)
+    flight = models.ForeignKey(Flight, on_delete=models.CASCADE, verbose_name=u'Рейс')
+    gate = models.ForeignKey(Gate, on_delete=models.CASCADE, verbose_name=u'Выход', blank=True, null=True)
+    status = models.ForeignKey(Status, on_delete=models.CASCADE, verbose_name=u'Статус', blank=True, null=True)
+    fly_type = models.ForeignKey(TypeFly, on_delete=models.CASCADE, verbose_name=u'Тип ВС', blank=True, null=True)
     time_from = models.DateTimeField(verbose_name=u'Время')
     time_to = models.DateTimeField(verbose_name=u'Время (фактическое)', blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True, verbose_name=u'Комментарий')
@@ -112,8 +96,6 @@ class Fly(models.Model):
     def __init__(self, *args, **kwargs):
         """
         Определение был ли ранее завершен перелет
-        :param args:
-        :param kwargs:
         """
         super().__init__(*args, **kwargs)
         self.was_closed = False
@@ -125,11 +107,6 @@ class Fly(models.Model):
         """
         Выполнение после сохранения проверки на завершение перелета и если мы завершили перелет,
         то увеличиваем счетчик для рейса
-        :param force_insert:
-        :param force_update:
-        :param using:
-        :param update_fields:
-        :return:
         """
         super(Fly, self).save()
         if self.status and not self.was_closed and self.status.name == u'Завершен':
@@ -139,11 +116,6 @@ class Fly(models.Model):
         return '{}  |  {}  |  {}  |  {}  |  {}  |  {}'.format(self.flight, self.time_from, self.time_to, self.gate,
                                                               self.status,
                                                               self.comment)
-
-    def __unicode__(self):
-        return u'{}  |  {}  |  {}  |  {}  |  {}  |  {}'.format(self.flight, self.time_from, self.time_to, self.gate,
-                                                               self.status,
-                                                               self.comment)
 
     class Meta:
         verbose_name = "Перелеты"

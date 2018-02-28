@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models import *
 
-admin.site.register([Type_fly, Status, Gate, Flight, City, Fly, ])
+admin.site.register([TypeFly, Status, Gate, Flight, City, Fly, ])

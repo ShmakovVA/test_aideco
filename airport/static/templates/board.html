@@ -11,18 +11,18 @@
                 </div>
             {% endfor %}
             <div class="large-3 columns float-left float-left">
-                <button class="button fi-filter" style="width: 100%; margin-top: 23px"> Фильтр </button>
+                <button class="button fi-filter" style="width: 100%; margin-top: 23px"> Фильтр</button>
             </div>
         </div>
     </form>
 
     <div class="grid-container">
         <div class="grid-x grid-padding-x">
-{#            <table>#}
-{#                {% render_table flights %}#}
-{#            </table>#}
+            {#            <table>#}
+            {#                {% render_table flights %}#}
+            {#            </table>#}
 
-            <table >
+            <table>
                 <tr>
                     <th>Рейс</th>
                     <th>Направление</th>
@@ -33,15 +33,15 @@
                     <th>Тип ВС</th>
                 </tr>
                 {% for f in flights %}
-                <tr >
-                    <td class="text-center">{{ f.flight.name }}</td>
-                    <td class="text-center">{{ f.flight.direction_from }} --- {{ f.flight.direction_to }}</td>
-                    <td class="text-center">{{ f.time_from }}</td>
-                    <td class="text-center">{{ f.time_to }}</td>
-                    <td class="text-center">{{ f.gate }}</td>
-                    <td class="text-center">{{ f.status }}</td>
-                    <td class="text-center">{{ f.fly_type }}</td>
-                </tr>
+                    <tr>
+                        <td class="text-center">{{ f.flight.name }}</td>
+                        <td class="text-center">{{ f.flight.direction_from }} --- {{ f.flight.direction_to }}</td>
+                        <td class="text-center">{{ f.time_from }}</td>
+                        <td class="text-center">{{ f.time_to }}</td>
+                        <td class="text-center">{{ f.gate }}</td>
+                        <td class="text-center">{{ f.status }}</td>
+                        <td class="text-center">{{ f.fly_type }}</td>
+                    </tr>
                 {% endfor %}
             </table>
 

@@ -35,8 +35,8 @@
     <div class="grid-x grid-padding-x">
         <div class="large-12 cell text-center">
             <ul>
-                <a class="button fi-arrow-down medium-2" href={% url 'a' %}> Прибытия </a>
-                <a class="button fi-arrow-up medium-2" href={% url 'd' %}> Отправления </a>
+                <a class="button fi-arrow-down medium-2" href={% url 'board' arr_or_dep=0 %}> Прибытия </a>
+                <a class="button fi-arrow-up medium-2" href={% url 'board' arr_or_dep=1 %}> Отправления </a>
 
                 <a class="button secondary fi-page-add medium-2" href={% url 'fill_db' %}> Заполнить БД </a>
             </ul>

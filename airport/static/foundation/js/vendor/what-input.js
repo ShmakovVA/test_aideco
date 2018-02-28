@@ -131,23 +131,23 @@ window.whatInput = (function () {
 
             if (
                 (// only if the user flag to allow typing in form fields isn't set
-                !body.hasAttribute('data-whatinput-formtyping') &&
+                    !body.hasAttribute('data-whatinput-formtyping') &&
 
-                // only if currentInput has a value
-                currentInput &&
+                    // only if currentInput has a value
+                    currentInput &&
 
-                // only if the input is `keyboard`
-                value === 'keyboard' &&
+                    // only if the input is `keyboard`
+                    value === 'keyboard' &&
 
-                // not if the key is `TAB`
-                keyMap[eventKey] !== 'tab' &&
+                    // not if the key is `TAB`
+                    keyMap[eventKey] !== 'tab' &&
 
-                // only if the target is a form input that accepts text
-                (
-                    eventTargetNode === 'textarea' ||
-                    eventTargetNode === 'select' ||
-                    (eventTargetNode === 'input' && nonTypingInputs.indexOf(eventTargetType) < 0)
-                )) || (
+                    // only if the target is a form input that accepts text
+                    (
+                        eventTargetNode === 'textarea' ||
+                        eventTargetNode === 'select' ||
+                        (eventTargetNode === 'input' && nonTypingInputs.indexOf(eventTargetType) < 0)
+                    )) || (
                     // ignore modifier keys
                     ignoreMap.indexOf(eventKey) > -1
                 )

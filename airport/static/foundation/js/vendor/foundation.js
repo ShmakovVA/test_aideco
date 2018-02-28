@@ -363,6 +363,7 @@
             return fBound;
         };
     }
+
     // Polyfill to get the name of a function in IE9
     function functionName(fn) {
         if (Function.prototype.name === undefined) {
@@ -753,6 +754,7 @@
         var anim,
             prog,
             start = null;
+
         // console.log('called');
 
         function move(ts) {
@@ -1346,7 +1348,7 @@
     function Timer(elem, options, cb) {
         var _this = this,
             duration = options.duration,
-        //options is an object for easily adding features later.
+            //options is an object for easily adding features later.
             nameSpace = Object.keys(elem.data())[0] || 'timer',
             remain = -1,
             start,
@@ -7421,13 +7423,13 @@ function _classCallCheck(instance, Constructor) {
                     handleDim = $hndl[0].getBoundingClientRect()[hOrW],
                     elemDim = this.$element[0].getBoundingClientRect()[hOrW],
 
-                //percentage of bar min/max value based on click or drag point
+                    //percentage of bar min/max value based on click or drag point
                     pctOfBar = percent(location - this.options.start, this.options.end - this.options.start).toFixed(2),
 
-                //number of actual pixels to shift the handle, based on the percentage obtained above
+                    //number of actual pixels to shift the handle, based on the percentage obtained above
                     pxToMove = (elemDim - handleDim) * pctOfBar,
 
-                //percentage of bar to shift the handle
+                    //percentage of bar to shift the handle
                     movement = (percent(pxToMove, elemDim) * 100).toFixed(this.options.decimal);
                 //fixing the decimal value for the location number, is passed to other methods as a fixed floating-point value
                 location = parseFloat(location.toFixed(this.options.decimal));
@@ -7440,10 +7442,10 @@ function _classCallCheck(instance, Constructor) {
                 if (isDbl) {
                     var isLeftHndl = this.handles.index($hndl) === 0,
 
-                    //empty variable, will be used for min-height/width for fill bar
+                        //empty variable, will be used for min-height/width for fill bar
                         dim,
 
-                    //percentage w/h of the handle compared to the slider bar
+                        //percentage w/h of the handle compared to the slider bar
                         handlePct = ~~(percent(handleDim, elemDim) * 100);
                     //if left handle, the math is slightly different than if it's the right handle, and the left/top property needs to be changed for the fill bar
                     if (isLeftHndl) {
@@ -8284,8 +8286,8 @@ function _classCallCheck(instance, Constructor) {
                     topPoint = this.points ? this.points[0] : this.$anchor.offset().top,
                     bottomPoint = this.points ? this.points[1] : topPoint + this.anchorHeight,
 
-                // topPoint = this.$anchor.offset().top || this.points[0],
-                // bottomPoint = topPoint + this.anchorHeight || this.points[1],
+                    // topPoint = this.$anchor.offset().top || this.points[0],
+                    // bottomPoint = topPoint + this.anchorHeight || this.points[1],
                     winHeight = window.innerHeight;
 
                 if (this.options.stickTo === 'top') {

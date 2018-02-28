@@ -1,26 +1,12 @@
 # -*- coding: utf-8 -*-
+
 from django.db.models import Q
 from tastypie.authorization import Authorization
 from tastypie.constants import ALL_WITH_RELATIONS
 from tastypie.resources import ModelResource
 
+from airport.api.dehydrate_utils import get_foreign_object
 from airport.models import Fly, Flight, City, Status
-
-
-def get_foreign(resource_calss, query_set):
-    """
-    Выполнение полной дегидрации объектов
-    :param resource_calss: класс ресурса
-    :param query_set: набор объектов для дегидрации
-    :return:
-    """
-    resource = resource_calss()
-    res = {'objects': []}
-    for obj in query_set:
-        bundle = resource.build_bundle(obj=obj)
-        dehydrate_obj = resource.full_dehydrate(bundle)
-        res['objects'].append(dehydrate_obj)
-    return res
 
 
 class FlightResource(ModelResource):
@@ -30,7 +16,7 @@ class FlightResource(ModelResource):
 
     class Meta:
         authorization = Authorization()
-        queryset = Flight.objects.all()  # .filter(flight__arr_dep=0)
+        queryset = Flight.objects.all()
         resource_name = 'flight'
 
     def dehydrate(self, bundle):
@@ -39,8 +25,10 @@ class FlightResource(ModelResource):
         :param bundle:
         :return:
         """
-        bundle.data['direction_from'] = get_foreign(CityResource, City.objects.filter(pk=bundle.obj.direction_from.pk))
-        bundle.data['direction_to'] = get_foreign(CityResource, City.objects.filter(pk=bundle.obj.direction_to.pk))
+        bundle.data['direction_from'] = get_foreign_object(CityResource,
+                                                           City.objects.filter(pk=bundle.obj.direction_from.pk))
+        bundle.data['direction_to'] = get_foreign_object(CityResource,
+                                                         City.objects.filter(pk=bundle.obj.direction_to.pk))
         return bundle
 
 
@@ -66,14 +54,14 @@ class StatusResource(ModelResource):
         resource_name = 'status'
 
 
-class FlyArrivalResource(ModelResource):
+class FlyResource(ModelResource):
     """
     Ресурс "Перелеты"
     """
 
     class Meta:
         authorization = Authorization()
-        queryset = Fly.objects.all()  # .filter(flight__arr_dep=0)
+        queryset = Fly.objects.all()
         resource_name = 'flights'
         fields = ['id', 'time_from', 'time_to', 'comment']
         filtering = {
@@ -87,8 +75,8 @@ class FlyArrivalResource(ModelResource):
         :param bundle:
         :return:
         """
-        bundle.data['flight'] = get_foreign(FlightResource, Flight.objects.filter(pk=bundle.obj.flight.pk))
-        bundle.data['status'] = get_foreign(StatusResource, Status.objects.filter(pk=bundle.obj.status.pk))
+        bundle.data['flight'] = get_foreign_object(FlightResource, Flight.objects.filter(pk=bundle.obj.flight.pk))
+        bundle.data['status'] = get_foreign_object(StatusResource, Status.objects.filter(pk=bundle.obj.status.pk))
         return bundle
 
     def apply_filters(self, request, applicable_filters):
@@ -104,40 +92,23 @@ class FlyArrivalResource(ModelResource):
         :param applicable_filters:
         :return:
         """
-        base_object_list = super(FlyArrivalResource, self).apply_filters(request, applicable_filters)
+        true_q = ~Q(pk=None)
+        base_object_list = super(FlyResource, self).apply_filters(request, applicable_filters)
 
-        arr_or_dep = request.GET.get('arr_or_dep', None)
-        status = request.GET.get('status', None)
-        city = request.GET.get('city', None)
-        flight = request.GET.get('flight', None)
+        arr_or_dep = request.GET.get('arr_or_dep', '')
+        status = request.GET.get('status', '')
+        city = request.GET.get('city', '')
+        flight = request.GET.get('flight', '')
 
-        if arr_or_dep and arr_or_dep == '':
-            arr_or_dep = None
-        if status and status == '':
-            status = None
-        if city and city == '':
-            city = None
-        if flight and flight == '':
-            flight = None
+        if arr_or_dep == 'arr':
+            q_direction = Q(flight__arr_dep=0)
+        elif arr_or_dep == 'dep':
+            q_direction = Q(flight__arr_dep=1)
+        else:
+            q_direction = true_q
 
-        if arr_or_dep and base_object_list:
-            if arr_or_dep in ['arr', 'dep']:
-                if arr_or_dep == 'arr':
-                    qt = Q(flight__arr_dep=0)
-                else:
-                    qt = Q(flight__arr_dep=1)
-                base_object_list = base_object_list.filter(qt).distinct()
-            else:
-                return []
+        q_status = Q(status__name__icontains=status) if status else true_q
+        q_city = Q(flight__direction_from__name__icontains=city) if city else true_q
+        q_flight = Q(flight__name__icontains=flight) if flight else true_q
 
-        if status and base_object_list:
-            qs = Q(status__name__icontains=status)
-            base_object_list = base_object_list.filter(qs).distinct()
-        if city and base_object_list:
-            qc = Q(flight__direction_from__name__icontains=city)
-            base_object_list = base_object_list.filter(qc).distinct()
-        if flight and base_object_list:
-            qf = Q(flight__name__icontains=flight)
-            base_object_list = base_object_list.filter(qf).distinct()
-
-        return base_object_list
+        return base_object_list.filter(q_direction & q_status & q_city & q_flight).distinct()
