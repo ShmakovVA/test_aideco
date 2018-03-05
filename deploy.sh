@@ -24,13 +24,16 @@ pip3 install -r requirements.txt
 echo "Installing uwsgi..."
 pip3 install uwsgi
 echo "Place link for nginx.conf in nginx..."
-sudo ln -s "$targetDir/aideco_nginx.conf" "/etc/nginx/sites-enabled/"
+ln -s "$targetDir/aideco_nginx.conf" "/etc/nginx/sites-enabled/"
 echo "Django manage.py commands..."
 python3 manage.py collectstatic
-python3 manage.py makemigrations $appName 
+python3 manage.py makemigrations $appName
 python3 manage.py migrate
 python3 manage.py createsuperuser
 echo "Nginx start..."
 /etc/init.d/nginx restart
 echo "Start via uwsgi..."
 uwsgi --ini uwsgi.ini
+echo "Autostart on boot..."
+sed -i "s/sudo uwsgi --ini \/var\/test_aideco\/uwsgi.ini//g" /etc/rc.local
+sed -i "s/exit 0/sudo uwsgi --ini \/var\/test_aideco\/uwsgi.ini\nexit 0/g" /etc/rc.local
